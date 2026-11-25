@@ -1,0 +1,1690 @@
+{
+  "name": "M4 - Integraciones La Fabrica",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -128,
+        176
+      ],
+      "id": "0308b4e2-2397-4f13-a0ae-daab0134f076",
+      "name": "When chat message received",
+      "webhookId": "a970a2de-0ea3-46e8-8abc-4b0d4142409c"
+    },
+    {
+      "parameters": {
+        "sendTo": "matiasburdisso17@gmail.com",
+        "subject": "Reporte de ejecución - Agente La Fábrica",
+        "message": "= ={{   '<h2>Reporte de ejecución - La Fábrica</h2>' +   '<p><b>Consulta recibida:</b> ' +   $('When chat message received').item.json.chatInput +   '</p>' +   '<p><b>Respuesta del agente:</b> ' +   $json.output +   '</p>' +   '<p><b>Estado:</b> Ejecución completada.</p>' +   '<p><b>Registro:</b> Workflow de atención comercial.</p>' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        640,
+        -720
+      ],
+      "id": "02e64335-a822-45b1-ae88-5b7470760f03",
+      "name": "Send a message",
+      "webhookId": "4c27b850-19a6-4e7e-a7e0-3f860306ec0b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "UalKWwKqlff3Qp3p",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 4
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ ($json.chatInput || '').toLowerCase() }}",
+                    "rightValue": "^(?!.*(redact|escrib|correo|mail|mensaje|responder|respuesta|whatsapp)).*(precio|tarifa|puesto|oficina|coworking|sala|servicio|alquiler|mensual)",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    },
+                    "id": "e4dc793f-1d53-40fe-bae2-59b838adcdaa"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "SALES"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 4
+                },
+                "conditions": [
+                  {
+                    "id": "062f2f54-3bcc-4acc-9b24-cdd69b994814",
+                    "leftValue": "={{ ($json.chatInput || '').toLowerCase() }}",
+                    "rightValue": "(redact|escrib|correo|mail|mensaje|responder|respuesta|whatsapp)",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "WRITING"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.5,
+      "position": [
+        992,
+        176
+      ],
+      "id": "850fcc1b-c8ce-4c25-906f-3b5f28721169",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "03d6283f-db85-4ea5-88d0-4abf41e6c1cf",
+              "name": "message",
+              "value": "={{$json.chatInput}}",
+              "type": "string"
+            },
+            {
+              "id": "c8ae9294-c268-4ece-8e95-b6fccb453dd8",
+              "name": "sessionId",
+              "value": "={{$json.sessionId}}",
+              "type": "string"
+            },
+            {
+              "id": "33ba768e-f007-43d4-a6f6-6ac0565a1788",
+              "name": "intent",
+              "value": "SALES",
+              "type": "string"
+            },
+            {
+              "id": "b16c82fd-9b55-4add-8b6b-7ba1546d60a7",
+              "name": "simulateError",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "5c34d8a9-2f70-4fbd-86da-b7eaab04220d",
+              "name": "shared_context",
+              "value": "={{ \"[INICIO DE CONTEXTO COMPARTIDO]\\nNombre: \" + ($json.user_name || \"No identificado\") + \"\\nEstado: \" + ($json.status || \"Nuevo\") + \"\\nResumen: \" + ($json.last_summary || \"Sin historial previo\") + \"\\n[FIN DEL CONTEXTO COMPARTIDO]\" }}",
+              "type": "string"
+            },
+            {
+              "id": "64a75d38-db99-4056-9c50-6de3acf23875",
+              "name": "memory_record_id",
+              "value": "={{ $json.memory_record_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1216,
+        128
+      ],
+      "id": "e8e7387c-8b7c-45a2-9f96-887bc8faa381",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "wM8BaqaJegCs7rQx",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/wM8BaqaJegCs7rQx",
+          "cachedResultName": "M2 - Worker 1 Comercial"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        1360,
+        128
+      ],
+      "id": "2b565426-d1d7-40fb-a13b-c82f65d21db3",
+      "name": "Call 'M2 - Worker 1 Comercial'"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b9f6323e-350a-46c5-a6f8-3610dd03ef54",
+              "name": "message",
+              "value": "={{$json.chatInput}}",
+              "type": "string"
+            },
+            {
+              "id": "20d90bfc-c07a-4f45-bc4e-19aad5858edf",
+              "name": "sessionId",
+              "value": "={{$json.sessionId}}",
+              "type": "string"
+            },
+            {
+              "id": "abd741fe-ab49-45b5-8938-eb85b33b114c",
+              "name": "intent",
+              "value": "WRITING",
+              "type": "string"
+            },
+            {
+              "id": "ad0b99de-126c-4904-b8a4-4d7b20a54fb2",
+              "name": "simulateError",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "db2110a5-acdc-4989-bfbd-4f23a8b832ee",
+              "name": "shared_context",
+              "value": "={{ \"[INICIO DE CONTEXTO COMPARTIDO]\\nNombre: \" + ($json.user_name || \"No identificado\") + \"\\nEstado: \" + ($json.status || \"Nuevo\") + \"\\nResumen: \" + ($json.last_summary || \"Sin historial previo\") + \"\\n[FIN DEL CONTEXTO COMPARTIDO]\" }}",
+              "type": "string"
+            },
+            {
+              "id": "d58231a2-26f3-4224-9dfc-32a77b808023",
+              "name": "memory_record_id",
+              "value": "={{ $json.memory_record_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1216,
+        336
+      ],
+      "id": "517f7483-9912-4b88-be87-1d6eae18c09c",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "H9RBXQpL9VBrDSur",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/H9RBXQpL9VBrDSur",
+          "cachedResultName": "M2 - Worker 2 Redaccion"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        1376,
+        336
+      ],
+      "id": "36294eed-f0a0-4685-bbc1-0380a3ba092d",
+      "name": "Call 'M2 - Worker 2 Redaccion'"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "df17f5a0-e2e0-49c5-9cb2-f94107669505",
+              "name": "status",
+              "value": "fallback",
+              "type": "string"
+            },
+            {
+              "id": "b8b7e441-5041-4807-ba95-3cf7e7389f8d",
+              "name": "worker",
+              "value": "none",
+              "type": "string"
+            },
+            {
+              "id": "2cf66a3e-7e87-46b3-a805-4a6e4c0d26ce",
+              "name": "result",
+              "value": "Consulta no reconocida. Se requiere revisión humana.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1216,
+        544
+      ],
+      "id": "82851529-3360-46b2-ba9d-66df4917c681",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appsANykdzIpA6t6k",
+          "mode": "list",
+          "cachedResultName": "Memoria Agentes",
+          "cachedResultUrl": "https://airtable.com/appsANykdzIpA6t6k"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblSYOm5x3IK99AgW",
+          "mode": "list",
+          "cachedResultName": "MEMORIA_AGENTES",
+          "cachedResultUrl": "https://airtable.com/appsANykdzIpA6t6k/tblSYOm5x3IK99AgW"
+        },
+        "filterByFormula": "={{ \"{Session_ID} = '\" + $json.sessionId + \"'\" }}",
+        "returnAll": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        96,
+        176
+      ],
+      "id": "7a659923-11f5-4f90-8e90-38daea909c4e",
+      "name": "Search records",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "2FR8mQFVJuyzVM9Q",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "35c34a2b-a7d6-44fe-98ac-7cad1080f2c6",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        320,
+        176
+      ],
+      "id": "7a4dd5d0-fd71-4897-aec6-20b0cfd249ab",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appsANykdzIpA6t6k",
+          "mode": "list",
+          "cachedResultName": "Memoria Agentes",
+          "cachedResultUrl": "https://airtable.com/appsANykdzIpA6t6k"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblSYOm5x3IK99AgW",
+          "mode": "list",
+          "cachedResultName": "MEMORIA_AGENTES",
+          "cachedResultUrl": "https://airtable.com/appsANykdzIpA6t6k/tblSYOm5x3IK99AgW"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Session_ID": "={{ $('When chat message received').item.json.sessionId }}",
+            "Nombre del usuario": "No identificado",
+            "Fecha de actualización": "={{ $now.toISODate() }}",
+            "Resumen consolidado": "Primera interacción. Sin historial previo.",
+            "Estado del caso": "Nuevo",
+            "Datos clave": "Sin datos registrados."
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Session_ID",
+              "displayName": "Session_ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Nombre del usuario",
+              "displayName": "Nombre del usuario",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Fecha de actualización",
+              "displayName": "Fecha de actualización",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Resumen consolidado",
+              "displayName": "Resumen consolidado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Estado del caso",
+              "displayName": "Estado del caso",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Datos clave",
+              "displayName": "Datos clave",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Prioridad de revisión",
+              "displayName": "Prioridad de revisión",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Urgente",
+                  "value": "Urgente"
+                },
+                {
+                  "name": "Próxima revisión",
+                  "value": "Próxima revisión"
+                },
+                {
+                  "name": "En seguimiento",
+                  "value": "En seguimiento"
+                },
+                {
+                  "name": "Sin prioridad aparente",
+                  "value": "Sin prioridad aparente"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Días desde la actualización",
+              "displayName": "Días desde la actualización",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Acción recomendada",
+              "displayName": "Acción recomendada",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        496,
+        432
+      ],
+      "id": "759a4ae2-1605-4ca7-ad3f-4c3d5dc7a847",
+      "name": "Create a record",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "2FR8mQFVJuyzVM9Q",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ea124067-3c3d-4597-9111-ad41af9ec0df",
+              "name": "user_name",
+              "value": "={{ $json.fields[\"Nombre del usuario\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "5720c572-c7f0-4c34-a00e-1ce0cfda4d78",
+              "name": "status",
+              "value": "={{ $json.fields[\"Estado del caso\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "98b31b43-6201-43b0-99f4-8598b60ef0a5",
+              "name": "last_summary",
+              "value": "={{ $json.fields[\"Resumen consolidado\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "72fd2e3c-59ed-4df4-8dc4-52cd989503c0",
+              "name": "chatInput",
+              "value": "={{ $('When chat message received').item.json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "4caceb2b-1ce7-4816-8cbb-84f79cf868dc",
+              "name": "sessionId",
+              "value": "={{ $('When chat message received').item.json.sessionId }}",
+              "type": "string"
+            },
+            {
+              "id": "c2090131-8c27-4645-a705-330201d0089d",
+              "name": "memory_record_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        768,
+        176
+      ],
+      "id": "53a70d6d-c450-48a5-8b87-47f814f70558",
+      "name": "Preparar contexto existente"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "442c0cfb-5fbb-4ad5-bbe5-24b8468dede9",
+              "name": "chatInput",
+              "value": "={{ $('When chat message received').item.json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "86b5697a-1a93-4505-af70-4a0cdb3bc742",
+              "name": "sessionId",
+              "value": "={{ $('When chat message received').item.json.sessionId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        736,
+        432
+      ],
+      "id": "12173468-5a3f-441a-b0a9-a45c330b0f5a",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appsANykdzIpA6t6k",
+          "mode": "list",
+          "cachedResultName": "Memoria Agentes",
+          "cachedResultUrl": "https://airtable.com/appsANykdzIpA6t6k"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblSYOm5x3IK99AgW",
+          "mode": "list",
+          "cachedResultName": "MEMORIA_AGENTES",
+          "cachedResultUrl": "https://airtable.com/appsANykdzIpA6t6k/tblSYOm5x3IK99AgW"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Edit Fields').item.json.memory_record_id }}",
+            "Session_ID": "={{ $('When chat message received').item.json.sessionId }}",
+            "Fecha de actualización": "=\t{{ $now.toISODate() }}",
+            "Resumen consolidado": "={{ $json.result }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Session_ID",
+              "displayName": "Session_ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Nombre del usuario",
+              "displayName": "Nombre del usuario",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Fecha de actualización",
+              "displayName": "Fecha de actualización",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Resumen consolidado",
+              "displayName": "Resumen consolidado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Estado del caso",
+              "displayName": "Estado del caso",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Datos clave",
+              "displayName": "Datos clave",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Prioridad de revisión",
+              "displayName": "Prioridad de revisión",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Urgente",
+                  "value": "Urgente"
+                },
+                {
+                  "name": "Próxima revisión",
+                  "value": "Próxima revisión"
+                },
+                {
+                  "name": "En seguimiento",
+                  "value": "En seguimiento"
+                },
+                {
+                  "name": "Sin prioridad aparente",
+                  "value": "Sin prioridad aparente"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Días desde la actualización",
+              "displayName": "Días desde la actualización",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Acción recomendada",
+              "displayName": "Acción recomendada",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1584,
+        128
+      ],
+      "id": "fef38fc2-b819-4302-8260-e4ed3f9e5ee7",
+      "name": "Update record",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "2FR8mQFVJuyzVM9Q",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appsANykdzIpA6t6k",
+          "mode": "list",
+          "cachedResultName": "Memoria Agentes",
+          "cachedResultUrl": "https://airtable.com/appsANykdzIpA6t6k"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblSYOm5x3IK99AgW",
+          "mode": "list",
+          "cachedResultName": "MEMORIA_AGENTES",
+          "cachedResultUrl": "https://airtable.com/appsANykdzIpA6t6k/tblSYOm5x3IK99AgW"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Edit Fields1').item.json.memory_record_id }}",
+            "Session_ID": "={{ $('When chat message received').item.json.sessionId }}",
+            "Nombre del usuario": "={{ $('Edit Fields1').item.json.user_name }}",
+            "Fecha de actualización": "={{ $now.toISODate() }}",
+            "Estado del caso": "Atendido",
+            "Datos clave": "Solicitud de redacción atendida por el agente.",
+            "Resumen consolidado": "={{ $json.output || $json.result }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Session_ID",
+              "displayName": "Session_ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Nombre del usuario",
+              "displayName": "Nombre del usuario",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Fecha de actualización",
+              "displayName": "Fecha de actualización",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Resumen consolidado",
+              "displayName": "Resumen consolidado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Estado del caso",
+              "displayName": "Estado del caso",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Datos clave",
+              "displayName": "Datos clave",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Prioridad de revisión",
+              "displayName": "Prioridad de revisión",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Urgente",
+                  "value": "Urgente"
+                },
+                {
+                  "name": "Próxima revisión",
+                  "value": "Próxima revisión"
+                },
+                {
+                  "name": "En seguimiento",
+                  "value": "En seguimiento"
+                },
+                {
+                  "name": "Sin prioridad aparente",
+                  "value": "Sin prioridad aparente"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Días desde la actualización",
+              "displayName": "Días desde la actualización",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Acción recomendada",
+              "displayName": "Acción recomendada",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1600,
+        336
+      ],
+      "id": "6394ae99-514b-4f5f-be01-9d4e634284a0",
+      "name": "Update record1",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "2FR8mQFVJuyzVM9Q",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "search",
+        "filterGroupsUi": {
+          "filterGroupsValues": [
+            {
+              "filtersUi": {
+                "filterValues": [
+                  {
+                    "propertyName": "email|string",
+                    "value": "={{ $json.email }}"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.3,
+      "position": [
+        1200,
+        -288
+      ],
+      "id": "2b190534-8370-4a46-8089-1bc3c2fd9204",
+      "name": "Search contacts",
+      "alwaysOutputData": true,
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "8STSUZWuUmjTY26X",
+          "name": "HubSpot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -128,
+        -176
+      ],
+      "id": "875c17b8-2e77-4f1f-8d04-a1009e2e0ae6",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "UalKWwKqlff3Qp3p",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "fe052655-768d-4213-8f3c-41a233e9f5d1",
+              "leftValue": "={{ ($json.headers?.from || '').toLowerCase() }}",
+              "rightValue": "=no-reply@",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            },
+            {
+              "id": "b01a8a1e-bea5-40af-befd-bd635402bbda",
+              "leftValue": "={{ ($json.headers?.subject || '').toLowerCase() }}",
+              "rightValue": "out of office",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            },
+            {
+              "id": "9844ab74-08e4-4400-91ec-2894da7b7f1a",
+              "leftValue": "={{ ($json.headers?.subject || '').toLowerCase() }}",
+              "rightValue": "auto-reply",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            },
+            {
+              "id": "4a143d84-1a86-425c-a909-42c89ab1d75b",
+              "leftValue": "={{ ($json.headers?.subject || '').toLowerCase() }}",
+              "rightValue": "undeliverable",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            },
+            {
+              "id": "ce9c61ea-679a-49ee-8a89-e25bac6885bc",
+              "leftValue": "={{ ($json.headers?.subject || '').toLowerCase() }}",
+              "rightValue": "delivery status notification",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            },
+            {
+              "id": "df178a1f-a214-4af1-99dd-56fbe5663a3f",
+              "leftValue": "={{ ($json.headers?.subject || '').toLowerCase() }}",
+              "rightValue": "automatic reply",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        64,
+        -176
+      ],
+      "id": "02547c12-5732-42e7-bdfa-84ec6f7c2457",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ \n'REMITENTE: ' + ($json.from?.text || '') +\n'\\nASUNTO: ' + ($json.subject || '') +\n'\\nCUERPO DEL CORREO:\\n' + ($json.text || '')\n}}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Sos el asistente comercial inteligente de La Fábrica Coworking, ubicado en Córdoba, Argentina.\n\nTu función es analizar los correos electrónicos entrantes, identificar consultas comerciales y preparar respuestas profesionales.\n\nOBJETIVOS:\n\n1. Identificar si el correo está relacionado con los servicios de La Fábrica Coworking.\n2. Detectar la intención del remitente: consulta de precios, disponibilidad de oficinas, puestos compartidos, salas, alquileres, servicios u otras consultas.\n3. Extraer los datos del potencial cliente cuando estén disponibles.\n4. Resumir el contenido del correo de manera clara.\n5. Redactar una respuesta sugerida, cordial, profesional y comercial.\n\nREGLAS:\n\n- Respondé siempre en español, salvo que el remitente escriba en otro idioma.\n- No inventes precios, disponibilidad, condiciones comerciales ni servicios.\n- Si falta información, indicá qué dato habría que consultar.\n- No confirmes reservas ni compromisos comerciales.\n- No envíes correos. Tu función es preparar borradores para revisión humana.\n- Si el correo no está relacionado con La Fábrica, identificálo como no comercial.\n- No interpretes publicidad, newsletters ni encuestas como consultas comerciales.\n\nFORMATO DE RESPUESTA:\n\nDevolvé exclusivamente un objeto JSON válido con estos campos:\n\n{\n  \"tipo\": \"comercial | no_comercial | otro\",\n  \"nombre_contacto\": \"\",\n  \"empresa\": \"\",\n  \"email_contacto\": \"\",\n  \"resumen\": \"\",\n  \"necesidad_detectada\": \"\",\n  \"respuesta_sugerida\": \"\",\n  \"requiere_revision\": true\n}\n\nNo agregues explicaciones fuera del JSON. No inventes información que no esté presente en el correo."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        288,
+        -272
+      ],
+      "id": "87f509a1-398c-47ca-87c5-00e629f5ebaa",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        288,
+        -64
+      ],
+      "id": "ac01aa9a-5b19-49ac-bb29-9e529f2a9ac7",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"tipo\": \"comercial\",\n  \"nombre_contacto\": \"Juan Pérez\",\n  \"empresa\": \"Empresa de ejemplo\",\n  \"email_contacto\": \"juan@empresa.com\",\n  \"resumen\": \"Consulta sobre alquiler de oficina\",\n  \"necesidad_detectada\": \"Oficina privada para cuatro personas\",\n  \"respuesta_sugerida\": \"Hola Juan, gracias por contactarnos. Podemos brindarte información sobre nuestras oficinas privadas.\",\n  \"requiere_revision\": true\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        448,
+        -64
+      ],
+      "id": "a8e31671-4a33-48bc-bfb3-54fe5feee333",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "ca38470f-bae2-46b0-b327-e24695951cc9",
+              "leftValue": "={{ $json.output.tipo }}",
+              "rightValue": "comercial",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        656,
+        -269.9431454933913
+      ],
+      "id": "a117f4cc-e79b-4577-92f2-4d36ff392097",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "90afcb88-131d-4505-90fa-fd021f922c07",
+              "name": "email",
+              "value": "={{ $json.output.email_contacto }}",
+              "type": "string"
+            },
+            {
+              "id": "4168ac37-cc29-4247-8f84-c1c402a1907d",
+              "name": "firstname",
+              "value": "={{ $json.output.nombre_contacto.split(' ')[0] }}",
+              "type": "string"
+            },
+            {
+              "id": "8a21e79b-396f-4d28-a2a6-64bdb4f5e2ed",
+              "name": "lastname",
+              "value": "={{ $json.output.nombre_contacto.split(' ').slice(1).join(' ') }}",
+              "type": "string"
+            },
+            {
+              "id": "e4719432-e26a-486d-9224-1e54a0e62c33",
+              "name": "company",
+              "value": "={{ $json.output.empresa }}",
+              "type": "string"
+            },
+            {
+              "id": "67e7e9fd-54a5-4feb-8542-94b222346aaf",
+              "name": "resumen_consulta",
+              "value": "={{ $json.output.resumen }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        928,
+        -288
+      ],
+      "id": "82f35c9b-a929-4a58-8f44-65b8ef864936",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "5a923276-395c-4f25-8f17-44ccaa653a56",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        1520,
+        -320
+      ],
+      "id": "a3176b2d-1752-4ac1-bdb1-c3bd034a0d68",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "email": "={{ $('Edit Fields4').item.json.email }}",
+        "additionalFields": {
+          "companyName": "={{ $('Edit Fields4').item.json.company }}",
+          "firstName": "={{ $('Edit Fields4').item.json.firstname }}",
+          "lastName": "={{ $('Edit Fields4').item.json.lastname }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.3,
+      "position": [
+        1744,
+        -380.30182632401653
+      ],
+      "id": "38e764da-7169-44df-a9ce-58d272592883",
+      "name": "Create or update a contact",
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "8STSUZWuUmjTY26X",
+          "name": "HubSpot account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "email": "={{ $('Edit Fields4').item.json.email }}",
+        "additionalFields": {
+          "companyName": "={{ $('Edit Fields4').item.json.company }}",
+          "firstName": "={{ $('Edit Fields4').item.json.firstname }}",
+          "lastName": "={{ $('Edit Fields4').item.json.lastname }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.3,
+      "position": [
+        1744,
+        -208
+      ],
+      "id": "3c155625-925c-468e-b52e-7d49c6081362",
+      "name": "Create or update a contact1",
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "8STSUZWuUmjTY26X",
+          "name": "HubSpot account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ 'Re: ' + ($('Gmail Trigger').item.json.subject || 'Consulta sobre La Fábrica') }}",
+        "message": "={{ $json.output.respuesta_sugerida }}",
+        "options": {
+          "sendTo": "={{ $('Gmail Trigger').item.json.from.value[0].address }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1216,
+        -448
+      ],
+      "id": "8ffe35fc-ed2f-41e5-8400-8e92bb83e3e0",
+      "name": "Create a draft",
+      "webhookId": "5631b9fe-e920-419c-bb0b-53c84ca7a7e4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "UalKWwKqlff3Qp3p",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0C0BKC24KA",
+          "mode": "list",
+          "cachedResultName": "nuevo-canal"
+        },
+        "text": "={{\n'📩 NUEVA CONSULTA COMERCIAL - LA FÁBRICA\\n' +\n'Contacto: ' + ($json.firstname || '') + ' ' + ($json.lastname || '') + '\\n' +\n'Empresa: ' + ($json.company || '') + '\\n' +\n'Email: ' + ($json.email || '') + '\\n' +\n'Consulta: ' + ($json.resumen_consulta || '')\n}}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        1216,
+        -608
+      ],
+      "id": "3064ecdc-22e1-4fe9-af8d-4ef7dcf06ce6",
+      "name": "Send a message1",
+      "webhookId": "bc76c2c3-0843-4d4b-b6eb-f92a8f189972",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "hq5t622eV9ovuFLB",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Call 'M2 - Worker 1 Comercial'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Call 'M2 - Worker 2 Redaccion'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Preparar contexto existente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar contexto existente": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a record": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'M2 - Worker 1 Comercial'": {
+      "main": [
+        [
+          {
+            "node": "Update record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'M2 - Worker 2 Redaccion'": {
+      "main": [
+        [
+          {
+            "node": "Update record1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Search contacts",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create a draft",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search contacts": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Create or update a contact",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create or update a contact1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a draft": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c7f58ee9-fe8e-489c-9813-e8ae4927fae6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a3284c37e47b6066ac981aedd14a321afa0a629964d05f123d9084b74bc06baa"
+  },
+  "nodeGroups": [],
+  "id": "Skhwmou7pEYIMbBB",
+  "tags": []
+}
